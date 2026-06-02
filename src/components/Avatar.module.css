@@ -1,0 +1,357 @@
+/* Avatar.module.css - CSS keyframe animations for avatar states */
+
+/* Base container */
+.avatarContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 200px;
+  height: 200px;
+  position: relative;
+}
+
+.stateLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+/* ========== IDLE STATE ========== */
+.idle .head {
+  fill: #93c5fd;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: breathe 4s ease-in-out infinite;
+}
+
+.idle .eyeWhite {
+  fill: white;
+}
+
+.idle .pupil {
+  fill: #1e3a5f;
+  animation: idleBlink 4s ease-in-out infinite;
+}
+
+.idle .mouth {
+  stroke: #1e3a5f;
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.idle .eyebrow {
+  stroke: #1e3a5f;
+  stroke-width: 3;
+  stroke-linecap: round;
+  fill: none;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes idleBlink {
+  0%, 45%, 55%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.1); }
+}
+
+/* ========== LISTENING STATE ========== */
+.listening .head {
+  fill: #60a5fa;
+}
+
+.listening .eyeWhite {
+  fill: white;
+}
+
+.listening .pupil {
+  fill: #1e40af;
+  transform: scale(1.15);
+}
+
+.listening .mouth {
+  stroke: #1e40af;
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.listening .eyebrow {
+  stroke: #1e40af;
+  stroke-width: 3;
+  stroke-linecap: round;
+  fill: none;
+  transform: translateY(-3px);
+}
+
+.listening .pulseRing {
+  stroke: #3b82f6;
+  fill: none;
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulseRing 1.5s ease-out infinite;
+}
+
+.listening .pulseRingInner {
+  animation-delay: 0.5s;
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+/* ========== THINKING STATE ========== */
+.thinking .head {
+  fill: #3b82f6;
+}
+
+.thinking .eyeWhite {
+  fill: white;
+}
+
+.thinking .pupil {
+  fill: #1e3a8a;
+  transform: translate(-3px, -4px);
+}
+
+.thinking .mouth {
+  stroke: #1e3a8a;
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.thinking .eyebrow {
+  stroke: #1e3a8a;
+  stroke-width: 3;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.thinking .eyebrowLeft {
+  transform: translateY(-4px) rotate(-5deg);
+  transform-origin: 70px 65px;
+}
+
+.thinking .thinkingDot {
+  fill: #1e40af;
+}
+
+.thinking .thinkingDot1 {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+.thinking .thinkingDot2 {
+  animation: bounce 1s ease-in-out infinite 0.2s;
+}
+
+.thinking .thinkingDot3 {
+  animation: bounce 1s ease-in-out infinite 0.4s;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ========== SPEAKING STATE ========== */
+.speaking .head {
+  fill: #2563eb;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: headBob 0.5s ease-in-out infinite;
+}
+
+.speaking .eyeWhite {
+  fill: white;
+}
+
+.speaking .pupil {
+  fill: #1e3a8a;
+}
+
+.speaking .mouth {
+  stroke: #1e3a8a;
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.speaking .mouthOpen {
+  fill: #1e3a8a;
+  animation: talk 1s ease-in-out infinite;
+}
+
+.speaking .eyebrow {
+  stroke: #1e3a8a;
+  stroke-width: 3;
+  stroke-linecap: round;
+  fill: none;
+}
+
+@keyframes headBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes talk {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.5); }
+}
+
+/* ========== SUPPORTIVE STATE ========== */
+.supportive .head {
+  fill: #5eead4;
+  filter: drop-shadow(0 0 15px rgba(94, 234, 212, 0.5));
+}
+
+.supportive .eyeWhite {
+  fill: white;
+}
+
+.supportive .pupil {
+  fill: #115e59;
+}
+
+.supportive .mouthOpen {
+  fill: #115e59;
+  animation: talkSupportive 0.8s ease-in-out infinite;
+}
+
+.supportive .eyebrow {
+  stroke: #115e59;
+  stroke-width: 3;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.supportive .glow {
+  fill: none;
+  stroke: #5eead4;
+  stroke-width: 3;
+  opacity: 0.4;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes talkSupportive {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.6); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.05); }
+}
+
+/* ========== WARNING STATE ========== */
+.warning .head {
+  fill: #fbbf24;
+}
+
+.warning .eyeWhite {
+  fill: white;
+}
+
+.warning .pupil {
+  fill: #92400e;
+}
+
+.warning .mouth {
+  stroke: #92400e;
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.warning .mouthOpen {
+  fill: #92400e;
+  animation: talkWarning 0.7s ease-in-out infinite;
+}
+
+.warning .eyebrow {
+  stroke: #92400e;
+  stroke-width: 4;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.warning .eyebrowLeft {
+  transform: rotate(-15deg);
+  transform-origin: 70px 55px;
+}
+
+.warning .eyebrowRight {
+  transform: rotate(15deg);
+  transform-origin: 130px 55px;
+}
+
+.warning .alertRing {
+  stroke: #dc2626;
+  fill: none;
+  stroke-width: 3;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: alertPulse 1s ease-in-out infinite;
+}
+
+@keyframes talkWarning {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.5); }
+}
+
+@keyframes alertPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+/* State label colors */
+.idle .stateLabel,
+.stateLabelIdle {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.stateLabelListening {
+  background-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.stateLabelThinking {
+  background-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.stateLabelSpeaking {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.stateLabelSupportive {
+  background-color: #ccfbf1;
+  color: #115e59;
+}
+
+.stateLabelWarning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
