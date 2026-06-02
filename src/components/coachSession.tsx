@@ -6,16 +6,19 @@ import Chat from "@/components/Chat";
 import PushToTalk from "@/components/PushToTalk";
 import { AvatarState, deriveAvatarState } from "@/lib/avatarState";
 import { ChatMessage } from "@/lib/types";
+import { useSpeech } from "@/lib/useSpeech";
 import { getCoachResponse } from "@/lib/mockBackend";
 
 export default function CoachSession() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [avatarState, setAvatarState] = useState<AvatarState>("idle");
   const [isBusy, setIsBusy] = useState(false);
+  const { speak, cancel } = useSpeech();
 
   async function handleSend(text: string) {
     if (!text.trim() || isBusy) return;
     setIsBusy(true);
+    cancel(); // stop any speech still playing from a previous answer
 
     setMessages((m) => [...m, { role: "user", text }]);
     setAvatarState("thinking");
@@ -23,10 +26,11 @@ export default function CoachSession() {
     const response = await getCoachResponse(text);
 
     setMessages((m) => [...m, { role: "assistant", response }]);
-    setAvatarState(deriveAvatarState(response));
 
-    
-    setTimeout(() => setAvatarState("idle"), 4000);
+    // speak the answer; avatar holds the emotion state until speech ends
+    const emotionState = deriveAvatarState(response);
+    setAvatarState(emotionState);
+    speak(response.answer, { onEnd: () => setAvatarState("idle") });
 
     setIsBusy(false);
   }
