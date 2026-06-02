@@ -16,4 +16,15 @@ export interface CoachResponse {
 
 export type ChatMessage =
   | { role: "user"; text: string }
-  | { role: "assistant"; response: CoachResponse };
+  | { role: "assistant"; response: CoachResponse 
+
+}
+
+export interface Feedback {
+  easeOfUse: number;       
+  avatarClarity: number;   
+  responseClarity: number; 
+  trust: number;           
+  comments: string;
+  submittedAt: string;     
+};
