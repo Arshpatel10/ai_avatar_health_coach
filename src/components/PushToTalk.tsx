@@ -2,18 +2,76 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 
+// Web Speech API type declarations
+interface SpeechRecognitionResult {
+  readonly isFinal: boolean;
+  readonly length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  readonly transcript: string;
+  readonly confidence: number;
+}
+
+interface SpeechRecognitionResultList {
+  readonly length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionEvent extends Event {
+  readonly resultIndex: number;
+  readonly results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  readonly error: string;
+  readonly message: string;
+}
+
+interface ISpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onstart: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onend: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onerror: ((this: ISpeechRecognition, ev: SpeechRecognitionErrorEvent) => void) | null;
+  onresult: ((this: ISpeechRecognition, ev: SpeechRecognitionEvent) => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
+interface ISpeechRecognitionConstructor {
+  new (): ISpeechRecognition;
+}
+
 interface PushToTalkProps {
   onRecordingStart: () => void;
   onTranscript: (text: string) => void;
   disabled?: boolean;
 }
 
+// Fallback transcripts when speech recognition is unavailable
 const SAMPLE_TRANSCRIPTS = [
   "How can I lower my cholesterol?",
   "How much water should I drink each day?",
   "I'm having chest pain and my left arm feels numb",
   "What is a healthy amount of sleep?",
 ];
+
+function getSpeechRecognition(): ISpeechRecognitionConstructor | null {
+  if (typeof window === "undefined") return null;
+
+  const win = window as typeof window & {
+    SpeechRecognition?: ISpeechRecognitionConstructor;
+    webkitSpeechRecognition?: ISpeechRecognitionConstructor;
+  };
+
+  return win.SpeechRecognition || win.webkitSpeechRecognition || null;
+}
 
 export default function PushToTalk({
   onRecordingStart,
@@ -22,13 +80,19 @@ export default function PushToTalk({
 }: PushToTalkProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [simulatedMode, setSimulatedMode] = useState(false);
-  const [micChecked, setMicChecked] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState("");
+  const [forcedSimulatedMode, setForcedSimulatedMode] = useState(false);
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const recognitionRef = useRef<ISpeechRecognition | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const transcriptIndexRef = useRef(0);
+  const finalTranscriptRef = useRef("");
+
+  // Check if speech recognition is available
+  const speechSupported = typeof window !== "undefined" && getSpeechRecognition() !== null;
+
+  // Simulated mode if not supported OR forced due to permission error
+  const simulatedMode = !speechSupported || forcedSimulatedMode;
 
   // Clean up on unmount
   useEffect(() => {
@@ -36,8 +100,8 @@ export default function PushToTalk({
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
       }
     };
   }, []);
@@ -65,54 +129,106 @@ export default function PushToTalk({
 
   const stopRecording = useCallback(() => {
     stopTimer();
+    setInterimTranscript("");
 
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      mediaRecorderRef.current.stop();
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      // The onend/onresult handlers will call onTranscript
+    } else if (simulatedMode) {
+      // Simulated mode - use predetermined transcript
+      setIsRecording(false);
+      const transcript = getNextTranscript();
+      onTranscript(transcript);
     }
+  }, [stopTimer, simulatedMode, getNextTranscript, onTranscript]);
 
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
+  const startRecording = useCallback(() => {
+    const SpeechRecognitionClass = getSpeechRecognition();
 
-    mediaRecorderRef.current = null;
-    setIsRecording(false);
+    if (SpeechRecognitionClass && !simulatedMode) {
+      // Use real speech recognition
+      const recognition = new SpeechRecognitionClass();
+      recognitionRef.current = recognition;
 
-    // Produce simulated transcript
-    const transcript = getNextTranscript();
-    onTranscript(transcript);
-  }, [stopTimer, getNextTranscript, onTranscript]);
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
 
-  const startRecording = useCallback(async () => {
-    // If already checked and in simulated mode, use simulated flow
-    if (micChecked && simulatedMode) {
+      finalTranscriptRef.current = "";
+
+      recognition.onstart = () => {
+        setIsRecording(true);
+        startTimer();
+        onRecordingStart();
+      };
+
+      recognition.onresult = (event) => {
+        let interim = "";
+        let final = "";
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const result = event.results[i];
+          if (result.isFinal) {
+            final += result[0].transcript;
+          } else {
+            interim += result[0].transcript;
+          }
+        }
+
+        if (final) {
+          finalTranscriptRef.current += final;
+        }
+        setInterimTranscript(interim);
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+
+        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+          // Mic permission denied - switch to simulated mode
+          setForcedSimulatedMode(true);
+        }
+
+        stopTimer();
+        setIsRecording(false);
+        setInterimTranscript("");
+        recognitionRef.current = null;
+
+        // If we got some transcript before the error, use it
+        if (finalTranscriptRef.current.trim()) {
+          onTranscript(finalTranscriptRef.current.trim());
+        }
+      };
+
+      recognition.onend = () => {
+        stopTimer();
+        setIsRecording(false);
+        setInterimTranscript("");
+        recognitionRef.current = null;
+
+        // Send the final transcript
+        const transcript = finalTranscriptRef.current.trim();
+        if (transcript) {
+          onTranscript(transcript);
+        }
+      };
+
+      try {
+        recognition.start();
+      } catch (err) {
+        console.error("Failed to start speech recognition:", err);
+        setForcedSimulatedMode(true);
+        setIsRecording(true);
+        startTimer();
+        onRecordingStart();
+      }
+    } else {
+      // Simulated mode
       setIsRecording(true);
       startTimer();
       onRecordingStart();
-      return;
     }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start();
-
-      setMicChecked(true);
-      setIsRecording(true);
-      startTimer();
-      onRecordingStart();
-    } catch {
-      // Microphone unavailable or permission denied
-      setSimulatedMode(true);
-      setMicChecked(true);
-      setIsRecording(true);
-      startTimer();
-      onRecordingStart();
-    }
-  }, [micChecked, simulatedMode, startTimer, onRecordingStart]);
+  }, [simulatedMode, startTimer, stopTimer, onRecordingStart, onTranscript]);
 
   const handleToggle = useCallback(() => {
     if (disabled) return;
@@ -135,24 +251,32 @@ export default function PushToTalk({
       {/* Simulated mode notice */}
       {simulatedMode && (
         <p className="text-xs text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
-          Microphone unavailable — using simulated voice input
+          Speech recognition unavailable — using simulated voice input
         </p>
       )}
 
       {/* Recording status - aria-live region */}
       <div
         aria-live="polite"
-        className="flex items-center gap-2 h-6"
+        className="flex flex-col items-center gap-1 min-h-[3rem]"
       >
         {isRecording && (
           <>
-            <span className="relative flex h-3 w-3">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
-            </span>
-            <span className="text-sm font-medium text-red-600">
-              Recording… {formatTime(elapsedSeconds)}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-3 w-3">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+              </span>
+              <span className="text-sm font-medium text-red-600">
+                Recording… {formatTime(elapsedSeconds)}
+              </span>
+            </div>
+            {/* Show interim transcript while recording */}
+            {interimTranscript && (
+              <p className="text-sm text-gray-500 italic max-w-xs text-center">
+                {interimTranscript}
+              </p>
+            )}
           </>
         )}
       </div>
