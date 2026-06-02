@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Avatar from "@/components/Avatar";
 import Chat from "@/components/Chat";
+import PushToTalk from "@/components/PushToTalk";
 import { AvatarState, deriveAvatarState } from "@/lib/avatarState";
 import { ChatMessage } from "@/lib/types";
 import { getCoachResponse } from "@/lib/mockBackend";
@@ -24,11 +25,16 @@ export default function CoachSession() {
     setMessages((m) => [...m, { role: "assistant", response }]);
     setAvatarState(deriveAvatarState(response));
 
-    // placeholder: return to idle after a few seconds.
-    // Phase 5 replaces this with the TTS "speech ended" event.
+    
     setTimeout(() => setAvatarState("idle"), 4000);
 
     setIsBusy(false);
+  }
+
+  // push-to-talk: when recording starts, the avatar listens.
+  // the transcript is sent through handleSend, which takes over the avatar flow.
+  function handleRecordingStart() {
+    setAvatarState("listening");
   }
 
   return (
@@ -43,6 +49,11 @@ export default function CoachSession() {
             setAvatarState(isTyping ? "listening" : "idle");
           }
         }}
+      />
+      <PushToTalk
+        onRecordingStart={handleRecordingStart}
+        onTranscript={handleSend}
+        disabled={isBusy}
       />
     </main>
   );
