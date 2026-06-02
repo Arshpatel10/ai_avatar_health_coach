@@ -1,0 +1,15 @@
+export type EmotionState = "neutral" | "supportive" | "warning";
+
+export interface EvidenceSource {
+  document_id: string;
+  chunk_id: string;
+  title?: string;    // human-readable label for the evidence chip
+  snippet?: string;  // short excerpt shown on hover/expand
+}
+
+export interface CoachResponse {
+  answer: string;
+  evidence_used: EvidenceSource[];
+  guardrail_triggered: boolean;
+  emotion_state: EmotionState;
+}
