@@ -13,3 +13,7 @@ export interface CoachResponse {
   guardrail_triggered: boolean;
   emotion_state: EmotionState;
 }
+
+export type ChatMessage =
+  | { role: "user"; text: string }
+  | { role: "assistant"; response: CoachResponse };
