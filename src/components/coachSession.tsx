@@ -4,6 +4,7 @@ import { useState } from "react";
 import Avatar from "@/components/Avatar";
 import Chat from "@/components/Chat";
 import PushToTalk from "@/components/PushToTalk";
+import FeedbackForm from "@/components/FeedbackForm";
 import { AvatarState, deriveAvatarState } from "@/lib/avatarState";
 import { ChatMessage } from "@/lib/types";
 import { useSpeech } from "@/lib/useSpeech";
@@ -59,6 +60,7 @@ export default function CoachSession() {
         onTranscript={handleSend}
         disabled={isBusy}
       />
+      <FeedbackForm />
     </main>
   );
 }
