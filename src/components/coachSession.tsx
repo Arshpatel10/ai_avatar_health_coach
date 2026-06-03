@@ -43,16 +43,16 @@ export default function CoachSession() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 p-4 px-6">
+    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 p-4 px-6">
       {/* Header */}
       <header className="w-full text-center">
-        <h1 className="text-3xl font-bold text-teal-800">
+        <h1 className="text-3xl font-bold text-slate-800">
           AI Avatar Health Coach
         </h1>
-        <p className="mt-2 text-lg text-teal-600">
+        <p className="mt-2 text-lg text-slate-700">
           Welcome to your personal health coach
         </p>
-        <p className="mt-3 text-sm text-teal-700/70 max-w-md mx-auto leading-relaxed">
+        <p className="mt-3 text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
           Ask questions about your health by typing in the chat below or use the push-to-talk button to speak. Your coach will respond with helpful guidance.
         </p>
       </header>
@@ -65,7 +65,7 @@ export default function CoachSession() {
         </div>
 
         {/* Chat section */}
-        <div className="flex-1 w-full flex flex-col items-center gap-1">
+        <div className="flex-1 w-full flex flex-col items-center">
           <Chat
             messages={messages}
             onSend={handleSend}

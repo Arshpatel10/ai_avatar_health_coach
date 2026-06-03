@@ -264,7 +264,7 @@ export default function PushToTalk({
   };
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center gap-1 mt-2">
       {/* Simulated mode notice */}
       {simulatedMode && (
         <p className="text-xs text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
@@ -275,7 +275,7 @@ export default function PushToTalk({
       {/* Recording status - aria-live region */}
       <div
         aria-live="polite"
-        className="flex flex-col items-center gap-1 min-h-[3rem]"
+        className="flex flex-col items-center gap-1"
       >
         {isRecording && (
           <>

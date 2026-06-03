@@ -51,7 +51,7 @@ export default function Chat({ messages, onSend, disabled = false, onTypingChang
   };
 
   return (
-    <div className="flex flex-col h-[500px] w-full border border-gray-200 rounded-lg overflow-hidden bg-white/80 backdrop-blur-sm shadow-sm">
+    <div className="flex flex-col h-[500px] w-full min-w-[550px] border border-gray-200 rounded-lg overflow-hidden bg-white/80 backdrop-blur-sm shadow-sm">
       {/* Message list - scrollable container */}
       <div
         className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 bg-white"
