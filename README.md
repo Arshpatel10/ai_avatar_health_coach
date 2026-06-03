@@ -137,7 +137,40 @@ the array is appended as new feedback responses are submitted.
 
 ## Screenshots
 
--Screenshot_1:
--Screenshot_2:
--Screenshot_3:
--Screenshot_4:
+-Screenshot_1: http://localhost:3000/avatar-preview shows a preview of all avatar states.
+-Screenshot_2: First working version of prototype before styling and bug fixes were implmented.
+-Screenshot_3: Demo of website with sample question and response.
+-Screenshot_4: Shows where feedback responses are stored locally.
+
+## Mock backend questions and answers
+  **Speaking (neutral responses):**
+  Keywords: water, hydration, hydrate, drink
+  Answer: "General guidance suggests roughly 2 to 3 liters of total water per day for most adults, including water from food. Your needs vary with activity, climate, and health conditions."
+  ────────────────────────────────────────
+  Keywords: blood pressure, medication, pills, antihypertensive
+  Answer: "Blood pressure medications work in different ways, and they should be taken as prescribed. Don't stop or change a dose
+    without speaking to your clinician first. This is general educational information only."
+  ────────────────────────────────────────
+  Keywords: Default (no keyword match)
+  Answer: "This is general educational information. I don't have a specific source for that question, so please discuss it with
+    your doctor for tailored advice."
+
+  **Supportive:**
+  Keywords: cholesterol, ldl, fiber
+  Answer: "Soluble fiber from foods like oats, beans, and apples can help lower LDL cholesterol. This is general educational
+    information, please discuss treatment options with your doctor."
+  ────────────────────────────────────────
+  Keywords: sleep, insomnia, tired, rest
+  Answer: "Most adults do best with 7 to 9 hours of sleep per night. A consistent schedule and limiting screens before bed can
+    help. If poor sleep persists, it's worth discussing with your clinician."
+
+  **Warning (guardrail triggered):**
+  Risk Type: cardiac_stroke
+  Message: "Your symptoms may require urgent medical attention. Please contact emergency services (911) immediately."
+  ────────────────────────────────────────
+  Risk Type: severe_acute
+  Message: "This could be a medical emergency. Please contact emergency services (911) or get to an emergency room right away."
+  ────────────────────────────────────────
+  Risk Type: mental_health_crisis
+  Message: "It sounds like you may be going through something serious. Please reach out to a trusted individual. You don't have to
+    go through this alone."
