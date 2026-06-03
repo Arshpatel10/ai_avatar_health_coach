@@ -11,7 +11,7 @@ backend is mocked.
 Requires Node.js 18+.
 
 ```bash
-git clone https://github.com/<your-username>/ai_avatar_health_coach.git
+git clone https://github.com/Arshpatel10/ai_avatar_health_coach.git
 cd ai_avatar_health_coach
 npm install
 npm run dev
