@@ -1,6 +1,19 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useSyncExternalStore } from "react";
+
+// SSR-safe way to check if we're on the client
+function subscribe() {
+  return () => {};
+}
+
+function useHasMounted() {
+  return useSyncExternalStore(
+    subscribe,
+    () => true,  // Client: return true
+    () => false  // Server: return false
+  );
+}
 
 // Web Speech API type declarations
 interface SpeechRecognitionResult {
@@ -88,11 +101,15 @@ export default function PushToTalk({
   const transcriptIndexRef = useRef(0);
   const finalTranscriptRef = useRef("");
 
-  // Check if speech recognition is available
-  const speechSupported = typeof window !== "undefined" && getSpeechRecognition() !== null;
+  // SSR-safe mount check to avoid hydration mismatch
+  const hasMounted = useHasMounted();
+
+  // Check if speech recognition is available (only after mount to avoid hydration mismatch)
+  const speechSupported = hasMounted && getSpeechRecognition() !== null;
 
   // Simulated mode if not supported OR forced due to permission error
-  const simulatedMode = !speechSupported || forcedSimulatedMode;
+  // Only show simulated mode notice after mount
+  const simulatedMode = hasMounted && (!speechSupported || forcedSimulatedMode);
 
   // Clean up on unmount
   useEffect(() => {

@@ -10,8 +10,28 @@
 
 .avatar {
   width: 200px;
-  height: 200px;
+  height: 320px;
   position: relative;
+}
+
+/* Doctor body styles */
+.doctorCoat {
+  fill: white;
+  stroke: #e5e7eb;
+  stroke-width: 2;
+}
+
+.coatLapel {
+  fill: #f0fdfa;
+  stroke: #99f6e4;
+  stroke-width: 1;
+}
+
+.stethoscope {
+  fill: none;
+  stroke: #374151;
+  stroke-width: 3;
+  stroke-linecap: round;
 }
 
 .stateLabel {
