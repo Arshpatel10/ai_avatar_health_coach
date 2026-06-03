@@ -137,40 +137,38 @@ the array is appended as new feedback responses are submitted.
 
 ## Screenshots
 
--Screenshot_1: http://localhost:3000/avatar-preview shows a preview of all avatar states.
--Screenshot_2: First working version of prototype before styling and bug fixes were implmented.
--Screenshot_3: Demo of website with sample question and response.
--Screenshot_4: Shows where feedback responses are stored locally.
+**All avatar states** (also live at [`/avatar-preview`](http://localhost:3000/avatar-preview))
+
+![All avatar states](screenshots/screenshot_1.png)
+
+**First working version of the prototype, before styling and bug fixes**
+
+![Early prototype](screenshots/screenshot_2.png)
+
+**Demo of the website with a sample question and response**
+
+![Demo](screenshots/screenshot_3.png)
+
+**Where feedback responses are stored locally**
+
+![Feedback storage](screenshots/screenshot_4.png)
 
 ## Mock backend questions and answers
-  **Speaking (neutral responses):**
-  Keywords: water, hydration, hydrate, drink
-  Answer: "General guidance suggests roughly 2 to 3 liters of total water per day for most adults, including water from food. Your needs vary with activity, climate, and health conditions."
-  ────────────────────────────────────────
-  Keywords: blood pressure, medication, pills, antihypertensive
-  Answer: "Blood pressure medications work in different ways, and they should be taken as prescribed. Don't stop or change a dose
-    without speaking to your clinician first. This is general educational information only."
-  ────────────────────────────────────────
-  Keywords: Default (no keyword match)
-  Answer: "This is general educational information. I don't have a specific source for that question, so please discuss it with
-    your doctor for tailored advice."
 
-  **Supportive:**
-  Keywords: cholesterol, ldl, fiber
-  Answer: "Soluble fiber from foods like oats, beans, and apples can help lower LDL cholesterol. This is general educational
-    information, please discuss treatment options with your doctor."
-  ────────────────────────────────────────
-  Keywords: sleep, insomnia, tired, rest
-  Answer: "Most adults do best with 7 to 9 hours of sleep per night. A consistent schedule and limiting screens before bed can
-    help. If poor sleep persists, it's worth discussing with your clinician."
+### Normal responses
 
-  **Warning (guardrail triggered):**
-  Risk Type: cardiac_stroke
-  Message: "Your symptoms may require urgent medical attention. Please contact emergency services (911) immediately."
-  ────────────────────────────────────────
-  Risk Type: severe_acute
-  Message: "This could be a medical emergency. Please contact emergency services (911) or get to an emergency room right away."
-  ────────────────────────────────────────
-  Risk Type: mental_health_crisis
-  Message: "It sounds like you may be going through something serious. Please reach out to a trusted individual. You don't have to
-    go through this alone."
+| Avatar state | Trigger keywords | Answer |
+|---|---|---|
+| Speaking (neutral) | water, hydration, hydrate, drink | "General guidance suggests roughly 2 to 3 liters of total water per day for most adults, including water from food. Your needs vary with activity, climate, and health conditions." |
+| Speaking (neutral) | blood pressure, medication, pills, antihypertensive | "Blood pressure medications work in different ways, and they should be taken as prescribed. Don't stop or change a dose without speaking to your clinician first. This is general educational information only." |
+| Speaking (neutral) | Default (no keyword match) | "This is general educational information. I don't have a specific source for that question, so please discuss it with your doctor for tailored advice." |
+| Supportive | cholesterol, ldl, fiber | "Soluble fiber from foods like oats, beans, and apples can help lower LDL cholesterol. This is general educational information, please discuss treatment options with your doctor." |
+| Supportive | sleep, insomnia, tired, rest | "Most adults do best with 7 to 9 hours of sleep per night. A consistent schedule and limiting screens before bed can help. If poor sleep persists, it's worth discussing with your clinician." |
+
+### High-risk responses (guardrail triggered)
+
+| Risk type | Safety message |
+|---|---|
+| cardiac_stroke | "Your symptoms may require urgent medical attention. Please contact emergency services (911) immediately." |
+| severe_acute | "This could be a medical emergency. Please contact emergency services (911) or get to an emergency room right away." |
+| mental_health_crisis | "It sounds like you may be going through something serious. Please reach out to a trusted individual. You don't have to go through this alone." |
